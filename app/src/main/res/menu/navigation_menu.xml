@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/Nav_menu">
+
+    <group android:id="@+id/group1"
+        android:checkableBehavior="single"/>
+    <item android:id="@+id/nav_gallery"
+        android:title="Gallery"
+        android:icon="@mipmap/ic_perm_media_black_24dp"
+        />
+
+    <item android:id="@+id/nav_camera"
+        android:title="Take A Picture"
+        android:icon="@mipmap/ic_add_a_photo_black_24dp"
+        />
+    <group android:id="@+id/group2"
+        android:checkableBehavior="single"/>
+    <group/>
+    <item android:title="Effects"
+        android:icon="@mipmap/ic_filter_list_black_24dp"
+        />
+        <menu>
+                <item
+                    android:id="@+id/nav_gray"
+                    android:title="Gray"/>
+                <item android:id="@+id/nav_sepia"
+                    android:title="Sepia"/>
+                <item android:id="@+id/nav_invert"
+                    android:title="Invert"/>
+                <item android:id="@+id/nav_random"
+                    android:title="Random Hue"/>
+                <item android:id="@+id/nav_contrast"
+                    android:title="Contrast"/>
+                <item android:id="@+id/nav_egalbw"
+                    android:title="Egalisation Black and White"/>
+                <item android:id="@+id/nav_egalc"
+                    android:title="Egalisation Color"/>
+                 <item android:id="@+id/nav_convolution"
+                    android:title="Convolution"/>
+                <item android:id="@+id/nav_flip"
+                    android:title="Flip"/>
+                <item android:id="@+id/nav_rotate"
+                    android:title="Rotate"/>
+                <item android:id="@+id/nav_test"
+                     android:title="Test"/>
+        </menu>
+    <group/>
+    <group android:checkableBehavior="single"/>
+    <item android:title="General"
+        android:icon="@mipmap/ic_call_to_action_black_24dp"/>
+         <menu>
+            <item android:id="@+id/nav_reset"
+                android:title="Reset"
+                android:icon="@mipmap/ic_history_black_24dp"
+            />
+            <item android:id="@+id/nav_save"
+                android:title="Save"
+                android:icon="@mipmap/ic_save_black_24dp"
+            />
+            <item android:id="@+id/nav_quit"
+                android:title="Quit"
+                android:icon="@mipmap/ic_exit_to_app_black_24dp"
+            />
+         </menu>
+    <group/>
+</menu>
