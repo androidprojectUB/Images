@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <ScrollView
+        <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.62"
@@ -56,10 +56,10 @@
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentEnd="true"
-                        android:scaleType="center"
-                        android:layout_weight="0.58"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:scaleType="fitCenter"
+                        android:layout_weight="1.11"
+                        android:layout_width="400dp"
+                        android:layout_height="400dp">
 
                     </ImageView>
 
@@ -104,7 +104,6 @@
     </LinearLayout>
 
     <android.support.design.widget.NavigationView
-
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         app3:menu="@menu/navigation_menu"
@@ -112,7 +111,6 @@
         app3:headerLayout="@layout/navigation_header"
         android:id="@+id/NavigationView"
         >
-
     </android.support.design.widget.NavigationView>
 
 

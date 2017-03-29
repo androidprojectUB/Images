@@ -34,6 +34,8 @@ import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.List;
 import java.util.Random;
 
 import static com.example.elherichihafsa.images.R.id.Nav_menu;
@@ -104,17 +107,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private NavigationView nv;
     private View v;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         myImageView = (ImageView) findViewById(R.id.lenna);
         final Bitmap b = BitmapFactory.decodeResource(getApplicationContext().getResources(), R.drawable.lenna);
         bmp = b.copy(Bitmap.Config.ARGB_8888, true);
         bmpSave = b.copy(Bitmap.Config.ARGB_8888, true);
-
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
         mToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.open, R.string.close);
@@ -124,12 +126,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         mToolbar = (Toolbar) findViewById(R.id.nav_action);
         setSupportActionBar(mToolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
         NavigationView nv = (NavigationView) findViewById(R.id.NavigationView);
         final View headerLayout = nv.getHeaderView(0);
+
 
         nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
 
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         return true;
 
                     case R.id.nav_gray:
-                        toGray2(bmp);
+                        toGray(bmp);
                         return true;
 
                     case R.id.nav_sepia:
@@ -173,8 +174,24 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         invert(bmp);
                         return true;
 
+                    case R.id.nav_red:
+                        colorFilter(bmp,1,0,0);
+                        return true;
+
+                    case R.id.nav_green:
+                        colorFilter(bmp,0,1,0);
+                        return true;
+
+                    case R.id.nav_Blue:
+                        colorFilter(bmp,0,0,1);
+                        return true;
+
                     case R.id.nav_random:
                         toColorize(bmp);
+                        return true;
+
+                    case R.id.nav_colordepth:
+                        decreaseColorDepth(bmp,64);
                         return true;
 
                     case R.id.nav_contrast:
@@ -189,8 +206,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         egalHistogram(bmp);
                         return true;
 
-                    case R.id.nav_convolution:
-                        convolution(bmp);
+                    case R.id.nav_moyenneur:
+                        Moyenneur(bmp);
                         return true;
 
                     case R.id.nav_flip:
@@ -201,6 +218,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         rotate(bmp,90f);
                         return true;
 
+                    case R.id.nav_Gauss3x3:
+                        GaussianBlur3x3(bmp);
+                        return true;
+
+                    case R.id.nav_median:
+                        median(bmp);
+                        return true;
+
+                    case R.id.nav_sharpen:
+                        return true;
+
                     case R.id.nav_test:
                         return true;
                 }
@@ -208,8 +236,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             }
         });
-
-
 
 
         seekbarLuminosity = (SeekBar) findViewById(R.id.seekBarLuminosity);
@@ -230,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         seekbarContrast.setMax(maxContrast);
         seekbarContrast.setProgress(maxContrast / 2);
         progressIntContrast = maxContrast / 2;
+
 
         // Création d'une seekBar pour le réglage du contraste
         seekbarContrast.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -412,8 +439,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             Toast.makeText(this, "Un problème s'est produit", Toast.LENGTH_LONG)
                     .show();
         }
-
-
     }
 
     public static Bitmap rotateImage(Bitmap source, float angle) {
@@ -422,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(),
                 matrix, true);
     }
+
     // fonction permettant de décoder un fichier contenant une photo prise depuis la caméra
     /* Fonction récupérée sur un forum de stackOverFlow */
 
@@ -444,7 +470,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         int scaleFactor = Math.min(width_tmp / targetW, height_tmp / targetH);
         // decode with inSampleSize
         try {
-
             o.inJustDecodeBounds = false;
             o.inSampleSize = scaleFactor;
             o.inPurgeable = true;
@@ -463,7 +488,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             e.printStackTrace();
             return null;
         }
-
     }
 
     public void reset() {
@@ -587,8 +611,30 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         myImageView.setImageBitmap(bmp);
     }
 
-    public void toGray2(Bitmap bmp) {
+    public void colorFilter(Bitmap bmp, double red, double green, double blue) {
+        operation = bmp.copy(Bitmap.Config.ARGB_8888,true);
+        // image size
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+        // color information
+        int R, G, B;
 
+        int[] pixels = new int[width*height];
+        bmp.getPixels(pixels,0,width,0,0,width,height);
+
+        // scan through all pixels
+        for(int i = 0; i < pixels.length; ++i) {
+                // apply filtering on each channel R, G, B
+                R = (int)(Color.red(pixels[i]) * red);
+                G = (int)(Color.green(pixels[i]) * green);
+                B = (int)(Color.blue(pixels[i]) * blue);
+                pixels[i] = Color.rgb(R,G,B);
+        }
+        operation.setPixels(pixels,0,width,0,0,width,height);
+        myImageView.setImageBitmap(operation);
+    }
+
+    public void toGray(Bitmap bmp) {
         int h = bmp.getHeight();
         int w = bmp.getWidth();
         int[] pixels = new int[h * w];
@@ -606,7 +652,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
         bmp.setPixels(pixels, 0, w, 0, 0, w, h);
         myImageView.setImageBitmap(bmp);
-
     }
 
     public void sepia(Bitmap bmp) {
@@ -639,16 +684,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             if (B > 255) {
                 B = 255;
             }
-
             pixels[i] = Color.rgb(R, G, B);
-
         }
         bmp.setPixels(pixels, 0, w, 0, 0, w, h);
         myImageView.setImageBitmap(bmp);
     }
 
     public void invert(Bitmap bmp) {
-
         int w = bmp.getWidth();
         int h = bmp.getHeight();
 
@@ -668,18 +710,15 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
 
     public void toColorize(Bitmap bmp) {
-
         // Récupération des dimensions
         int width = bmp.getWidth();
         int height = bmp.getHeight();
-
 
         int[] pixels = new int[width * height];
         // crée une variable aléatoire
         Random ran = new Random();
         // nbr va prendre en charge les possibilités [0 ... 360) pour la teinte
         int nbr = ran.nextInt(360);
-
 
         bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
 
@@ -704,10 +743,41 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         myImageView.setImageBitmap(bmp);
     }
 
+    public void decreaseColorDepth(Bitmap bmp, int bitOffset) {
+        // get image size
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+        // color information
+        int  R, G, B;
+
+        int[] pixels = new int[width*height];
+        bmp.getPixels(pixels,0,width,0,0,width,height);
+
+        // scan through all pixels
+        for(int i = 0; i < pixels.length; ++i) {
+                // get pixel color
+                R = Color.red(pixels[i]);
+                G = Color.green(pixels[i]);
+                B = Color.blue(pixels[i]);
+
+                // round-off color offset
+                R = ((R + (bitOffset / 2)) - ((R + (bitOffset / 2)) % bitOffset) - 1);
+                if(R < 0) { R = 0; }
+                G = ((G + (bitOffset / 2)) - ((G + (bitOffset / 2)) % bitOffset) - 1);
+                if(G < 0) { G = 0; }
+                B = ((B + (bitOffset / 2)) - ((B + (bitOffset / 2)) % bitOffset) - 1);
+                if(B < 0) { B = 0; }
+
+            pixels[i] = Color.rgb(R,G,B);
+            }
+
+        bmp.setPixels(pixels,0,width,0,0,width,height);
+        myImageView.setImageBitmap(bmp);
+    }
+
     /* Fonction récupérée sur une page GitHub*/
 
     public void contrast(Bitmap bmp, double value) {
-
         // Taille de l'image
         int width = bmp.getWidth();
         int height = bmp.getHeight();
@@ -719,7 +789,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         int[] pixels = new int[width * height];
         bmp.getPixels(pixels, 0, bmp.getWidth(), 0, 0, bmp.getWidth(), bmp.getHeight());
-
 
         // Parcourt l'image
         for (int i = 0; i < pixels.length; ++i) {
@@ -752,14 +821,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             // Applique le changement de couleur à la bitmap
             bmp.setPixels(pixels, 0, width, 0, 0, width, height);
-
         }
         myImageView.setImageBitmap(bmp);
     }
 
     public int[] histogram(Bitmap bmp) {
         // Grise bmp
-        toGray2(bmp);
+        toGray(bmp);
         int w = bmp.getWidth();
         int h = bmp.getHeight();
         int[] hist = new int[256]; // Crée un tableau de taille 256 pour chaque niveau de gris de bmp
@@ -884,10 +952,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
 
-    public void convolution(Bitmap bmp) {
+    public void Moyenneur(Bitmap bmp) {
 
         int SIZE = 3;
-
 
         int[][] Matrix = new int[SIZE][SIZE];
         for (int i = 0; i < SIZE; ++i) {
@@ -896,28 +963,28 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         }
 
-
         int width = bmp.getWidth();
         int height = bmp.getHeight();
 
         int sumR, sumG, sumB = 0;
-
+        int[] pixels = new int [width*height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
 
         for (int x = 1; x < width - 1; ++x) {
             for (int y = 1; y < height - 1; ++y) {
 
                 sumR = sumG = sumB = 0;
 
+                int index=0;
 
                 for (int u = -1; u <= 1; ++u) {
                     for (int v = -1; v <= 1; ++v) {
-
-                        sumR += Color.red(bmp.getPixel(x + u, y + v)) * Matrix[u + 1][v + 1];
-                        sumG += Color.green(bmp.getPixel(x + u, y + v)) * Matrix[u + 1][v + 1];
-                        sumB += Color.blue(bmp.getPixel(x + u, y + v)) * Matrix[u + 1][v + 1];
+                        index = (y+v)*width +(x+u);
+                        sumR += Color.red(pixels[index]) * Matrix[u + 1][v + 1];
+                        sumG += Color.green(pixels[index]) * Matrix[u + 1][v + 1];
+                        sumB += Color.blue(pixels[index]) * Matrix[u + 1][v + 1];
                     }
                 }
-
 
                 sumR = sumR / 9;
 
@@ -925,12 +992,104 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
                 sumB = sumB / 9;
 
+                bmp.setPixel(x, y, Color.rgb(sumR, sumG, sumB));
+
+            }
+        }
+
+        myImageView.setImageBitmap(bmp);
+    }
+
+    public void GaussianBlur3x3(Bitmap bmp) {
+
+        int[][] Matrix = new int[][] {
+                {1,2,1},
+                {2,4,2},
+                {1,2,1}
+        };
+
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+
+        int sumR, sumG, sumB = 0;
+
+        int[] pixels = new int [width*height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for (int x = 1; x < width - 1; ++x) {
+            for (int y = 1; y < height - 1; ++y) {
+
+                sumR = sumG = sumB = 0;
+                int index=0;
+
+
+                for (int u = -1; u <= 1; ++u) {
+                    for (int v = -1; v <= 1; ++v) {
+
+                        index = (y+v)*width +(x+u);
+                        sumR += Color.red(pixels[index]) * Matrix[u + 1][v + 1];
+                        sumG += Color.green(pixels[index]) * Matrix[u + 1][v + 1];
+                        sumB += Color.blue(pixels[index]) * Matrix[u + 1][v + 1];
+                    }
+                }
+
+
+                sumR = sumR / 16;
+
+                sumG = sumG / 16;
+
+                sumB = sumB / 16;
+
 
                 bmp.setPixel(x, y, Color.rgb(sumR, sumG, sumB));
 
             }
         }
 
+        myImageView.setImageBitmap(bmp);
+    }
+
+
+    public int[] sort(int[] tab){
+        int k= 0;
+        for(int i = 0;i<tab.length-1;i++){
+            for(int j=i+1;j<tab.length;j++){
+                if(tab[j]<tab[i]){
+                    tab[i] = k;
+                    tab[i] = tab[j];
+                    tab[j] = k;
+                }
+            }
+        }
+        return tab;
+    }
+    public void median(Bitmap bmp){
+        int w = bmp.getWidth();
+        int h = bmp.getHeight();
+
+        int[] tab = new int [9];
+        int[] pixels = new int[w*h];
+
+        bmp.getPixels(pixels, 0, w, 0, 0, w, h);
+
+        int index = 0;
+        // iteration through pixels
+        for(int y = 1; y < h-1; ++y) {
+            for(int x = 1; x < w-1; ++x) {
+                for(int i=-1;i<2;i++){
+                    for(int j=-1;j<2;j++){
+                        index = (y+j)*w +(x+i);
+                        for(int u=0;u<tab.length;u++){
+                            tab[u] = pixels[index];
+                        }
+                        tab = sort(tab);
+                        int med = tab[tab.length/2];
+                        pixels[index] = med;
+                    }
+                }
+            }
+        }
+        bmp.setPixels(pixels, 0, w, 0, 0, w, h);
         myImageView.setImageBitmap(bmp);
     }
 

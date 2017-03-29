@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:id="@+id/Nav_menu">
 
     <group android:id="@+id/group1"
@@ -17,34 +18,69 @@
     <group android:id="@+id/group2"
         android:checkableBehavior="single"/>
     <group/>
-    <item android:title="Effects"
-        android:icon="@mipmap/ic_filter_list_black_24dp"
-        />
+            <group>
+            <item android:title="Color Filters"
+                android:icon="@mipmap/ic_color"/>
+                <menu>
+                    <item
+                        android:id="@+id/nav_gray"
+                        android:title="Gray"/>
+                    <item android:id="@+id/nav_sepia"
+                        android:title="Sepia"/>
+                    <item android:id="@+id/nav_invert"
+                        android:title="Invert"/>
+                    <item android:id="@+id/nav_red"
+                        android:title="Filter color Red"/>
+                    <item android:id="@+id/nav_green"
+                        android:title="Filter color Green"/>
+                    <item android:id="@+id/nav_Blue"
+                        android:title="Filter color Blue"/>
+                    <item android:id="@+id/nav_random"
+                        android:title="Random Hue"/>
+                    <item android:id="@+id/nav_colordepth"
+                        android:title="Color Depth"/>
+                </menu>
+            </group>
+            <group>
+            <item android:title="Contrast Filters"
+                android:icon="@mipmap/ic_contrast"/>
+                <menu>
+                    <item android:id="@+id/nav_contrast"
+                        android:title="Contrast"/>
+                    <item android:id="@+id/nav_egalbw"
+                        android:title="Egalisation Black and White"/>
+                    <item android:id="@+id/nav_egalc"
+                        android:title="Egalisation Color"/>
+
+                    </menu>
+            </group>
+            <group>
+            <item android:title="Convolution Filters"
+                android:icon="@mipmap/ic_blur_circular_black_24dp"/>
+            <menu>
+                <item android:id="@+id/nav_moyenneur"
+                    android:title="Moyenneur"/>
+                <item android:id="@+id/nav_median"
+                    android:title="Median"/>
+                <item android:id="@+id/nav_Gauss3x3"
+                    android:title="Gaussian Blur"/>
+                <item android:id="@+id/nav_sharpen"
+                    android:title="Sharpen"/>
+
+                </menu>
+            </group>
+    <group>
+        <item android:title="More Options"
+            android:icon="@drawable/option_white"/>
         <menu>
-                <item
-                    android:id="@+id/nav_gray"
-                    android:title="Gray"/>
-                <item android:id="@+id/nav_sepia"
-                    android:title="Sepia"/>
-                <item android:id="@+id/nav_invert"
-                    android:title="Invert"/>
-                <item android:id="@+id/nav_random"
-                    android:title="Random Hue"/>
-                <item android:id="@+id/nav_contrast"
-                    android:title="Contrast"/>
-                <item android:id="@+id/nav_egalbw"
-                    android:title="Egalisation Black and White"/>
-                <item android:id="@+id/nav_egalc"
-                    android:title="Egalisation Color"/>
-                 <item android:id="@+id/nav_convolution"
-                    android:title="Convolution"/>
-                <item android:id="@+id/nav_flip"
-                    android:title="Flip"/>
-                <item android:id="@+id/nav_rotate"
-                    android:title="Rotate"/>
-                <item android:id="@+id/nav_test"
-                     android:title="Test"/>
+             <item android:id="@+id/nav_flip"
+                android:title="Flip"/>
+            <item android:id="@+id/nav_rotate"
+                android:title="Rotate"/>
+            <item android:id="@+id/nav_test"
+                android:title="Test"/>
         </menu>
+    </group>
     <group/>
     <group android:checkableBehavior="single"/>
     <item android:title="General"
