@@ -708,7 +708,37 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         myImageView.setImageBitmap(bmp);
     }
 
+public static Bitmap Median3x3(Bitmap bmp) {
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
 
+
+        int[] tabPixel = new int[9];
+        int[] pixels = new int[width * height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+        for (int x = 1; x < width - 1; ++x) {
+            for (int y = 1; y < height - 1; ++y) {
+
+
+                int index = 0;
+                int i = 0;
+                for (int u = -1; u <= 1; ++u) {
+                    for (int v = -1; v <= 1; ++v) {
+                        index = (y + v) * width + (x + u);
+                        tabPixel[i] = pixels[index];
+                        i += 1;
+
+                    }
+                }
+
+                Arrays.sort(tabPixel);
+                bmp.setPixel(x, y, tabPixel[(tabPixel.length / 2)]);
+            }
+
+        }
+        return bmp;
+    }
+ 
     public void toColorize(Bitmap bmp) {
         // Récupération des dimensions
         int width = bmp.getWidth();
