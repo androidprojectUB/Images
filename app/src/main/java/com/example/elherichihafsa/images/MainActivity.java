@@ -1049,6 +1049,54 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         myImageView.setImageBitmap(bmp);
     }
 
+    public static Bitmap GaussianBlur5x5(Bitmap bmp) {
+
+        int[][] Matrix = new int[][] {
+                {1,2,3,2,1},
+                {2,6,8,6,2},
+                {3,8,10,8,3},
+                {2,6,8,6,2},
+                {1,2,3,2,1}
+        };
+
+        int width = bmp.getWidth();
+        int height = bmp.getHeight();
+
+        int sumR, sumG, sumB = 0;
+
+        int[] pixels = new int [width*height];
+        bmp.getPixels(pixels, 0, width, 0, 0, width, height);
+
+        for (int x = 2; x < width - 2; ++x) {
+            for (int y = 2; y < height - 2; ++y) {
+
+                sumR = sumG = sumB = 0;
+                int index=0;
+
+                for (int u = -2; u <= 2; ++u) {
+                    for (int v = -2; v <= 2; ++v) {
+                        index = (y+v)*width +(x+u);
+                        sumR += Color.red(pixels[index]) * Matrix[u + 2][v + 2];
+                        sumG += Color.green(pixels[index]) * Matrix[u + 2][v + 2];
+                        sumB += Color.blue(pixels[index]) * Matrix[u + 2][v + 2];
+                    }
+                }
+
+
+                sumR = sumR / 98;
+
+                sumG = sumG / 98;
+
+                sumB = sumB / 98;
+
+
+                bmp.setPixel(x, y, Color.rgb(sumR, sumG, sumB));
+
+            }
+        }
+
+        return bmp;
+    }
 
     public int[] sort(int[] tab){
         int k= 0;
